@@ -3,6 +3,8 @@
  */
 package com.talks.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -13,6 +15,8 @@ import org.springframework.util.StringUtils;
 
 import com.talks.dto.AttendeeRequest;
 import com.talks.dto.AttendeeResponse;
+import com.talks.dto.Speaker;
+import com.talks.dto.TalkAttendees;
 import com.talks.dto.TalkInviteResponse;
 import com.talks.dto.TalksRequest;
 import com.talks.dto.TalksResponse;
@@ -88,8 +92,8 @@ public class TalksServiceImpl implements TalksService {
 			}else {
 				throw new InvalidInputException("invalid Talk Request");
 			}
-		} catch (InvalidInputException ex) {
-           LOGGER.error(logPrefix+"Error in processing Add Talk request", ex);
+		} catch (InvalidInputException inputException) {
+           LOGGER.error(logPrefix+"Error in processing Add Talk request", inputException);
             throw new InvalidInputException("Error in processing Add Talk request");
 		} catch(Exception ex){
 		   LOGGER.error(logPrefix+"Error in processing Add Talk request ", ex);
@@ -124,8 +128,8 @@ public class TalksServiceImpl implements TalksService {
 			}else {
 				throw new InvalidInputException("invalid Add Attendee Request");
 			}
-		} catch (InvalidInputException ex) {
-	           LOGGER.error(logPrefix+"Error in processing Add Attendee request", ex);
+		} catch (InvalidInputException inputException) {
+	           LOGGER.error(logPrefix+"Error in processing Add Attendee request", inputException);
 	            throw new InvalidInputException("Error in processing Add Attendee request");
 		} catch(Exception ex){
 			   LOGGER.error(logPrefix+"Error in processing Add Attendee request ", ex);
@@ -160,14 +164,77 @@ public class TalksServiceImpl implements TalksService {
 			}else{
 				throw new InvalidInputException("invalid Add Attendees to Talk Request");
 			}
-		} catch (InvalidInputException ex) {
-	           LOGGER.error(logPrefix+"Error in processing Add Attendee request", ex);
+		} catch (InvalidInputException inputException) {
+	           LOGGER.error(logPrefix+"Error in processing Add Attendee request", inputException);
 	            throw new InvalidInputException("Error in processing Add Attendee request");
 		} catch(Exception ex){
 			   LOGGER.error(logPrefix+"Error in processing Add Attendee request ", ex);
 		}
 		LOGGER.info(logPrefix+"Exiting addAttendeeToTalk()");
 		return talkInviteResponse;
+	}
+
+	@Override
+	public List<TalkAttendees> getAllAttendessByTalk(String title) throws InvalidInputException{
+		String logPrefix = TalksServiceImpl.class.toString() + ":: getAllAttendessByTalk()::";
+		LOGGER.info(logPrefix+"Entering getAllAttendessByTalk()");
+		
+		List<TalkAttendees> response =new ArrayList<TalkAttendees>();
+		
+		try{
+			if(null != title){
+				TalksEntity talksEntity = talksRepository.findByTalksTitle(title);
+				if(null == talksEntity){
+					throw new InvalidInputException("invalid Talk title");
+				}
+				List<TalkAttendeesEntity> talkAttendeesEntities = talksAttendeesRepository.findAllByTalks(talksEntity);
+				buildAttendeesResponse(talksEntity, talkAttendeesEntities, response);
+			}
+		} catch (InvalidInputException inputException) {
+	           LOGGER.error(logPrefix+"Error in processing Add Attendee request", inputException);
+	            throw new InvalidInputException("Error in processing Add Attendee request");
+		} catch(Exception ex){
+			   LOGGER.error(logPrefix+"Error in processing Add Attendee request ", ex);
+		}
+		LOGGER.info(logPrefix+"Exiting getAllAttendessByTalk()");
+		return response;
+	}
+	
+	private void buildAttendeesResponse(TalksEntity talksEntity, List<TalkAttendeesEntity> talkAttendeesEntities, List<TalkAttendees> response){
+		String logPrefix = TalksServiceImpl.class.toString() + ":: buildAttendeesResponse()::";
+		LOGGER.info(logPrefix+"Entering buildAttendeesResponse()");
+		try{
+			TalkAttendees attendee = new TalkAttendees();
+			attendee.setTitle(talksEntity.getTitle());
+			attendee.setTalkAbstract(talksEntity.getTalkAbstract());
+			attendee.setRoom(talksEntity.getRoom().getNumber());
+			//Set speaker
+			Speaker speaker = new Speaker();
+			speaker.setName(talksEntity.getSpeaker().getName());
+			speaker.setEmail(talksEntity.getSpeaker().getEmail());
+			speaker.setCompany(talksEntity.getSpeaker().getCompnay());
+			speaker.setBio(talksEntity.getSpeaker().getBioData());
+			attendee.setSpeaker(speaker);
+			
+			if(null != talkAttendeesEntities && !talkAttendeesEntities.isEmpty()){
+				for(TalkAttendeesEntity attendeesEntity : talkAttendeesEntities){
+					//Set attendees
+					AttendeeRequest attendeeData = new AttendeeRequest();
+					attendeeData.setName(attendeesEntity.getAttendee().getName());
+					attendeeData.setEmail(attendeesEntity.getAttendee().getEmail());
+					attendeeData.setCompnay(attendeesEntity.getAttendee().getCompnay());
+					attendeeData.setRegistered(attendeesEntity.getAttendee().getRegisteredDateTime().toString());
+					attendee.getAttendees().add(attendeeData);
+				}
+			}
+			response.add(attendee);
+		} catch (InvalidInputException ex) {
+	           LOGGER.error(logPrefix+"Error in processing Add Attendee request", ex);
+	            throw new InvalidInputException("Error in processing Add Attendee request");
+		} catch(Exception ex){
+			   LOGGER.error(logPrefix+"Error in processing Add Attendee request ", ex);
+		}
+		LOGGER.info(logPrefix+"Exiting buildAttendeesResponse()");
 	}
 
 }

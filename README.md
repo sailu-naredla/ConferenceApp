@@ -1,22 +1,21 @@
 
-1. import project in to eclipse/STS
+1. import project in to Eclipse/STS
 
-2. run the project
+2. Run the project
 
-3. on application bootstarp springboot populates the data in to H2 tables- refer src/main/resoutce/data.sql file
-in source code
-
-4. access H2 console http://localhost:8080/h2-console
-
-NOTE : no password required and click on connect
-
-5. Run below queries on H2 console - To insert Rooms master data
+3. On application bootstarp springboot populates the data in to H2 tables- refer src/main/resoutce/data.sql file
+in source code --  This inserts Rooms master data in H2 DB
 
 INSERT INTO ROOMS (id, room_number, status, created_on) VALUES (1, 'R1001', true, CURRENT_TIMESTAMP());    
 INSERT INTO ROOMS (id, room_number, status, created_on) VALUES (2, 'R1002', true, CURRENT_TIMESTAMP());    
 INSERT INTO ROOMS (id, room_number, status, created_on) VALUES (3, 'R1003', true, CURRENT_TIMESTAMP()); 
 
-6. Add new tlk
+4. Access H2 console http://localhost:8080/h2-console
+
+NOTE : no password required and click on connect
+
+
+5. Add new talk wih Room details
 
 URL : http://localhost:8080/api/v1/talksto
 Http Method: POST
@@ -43,7 +42,7 @@ Output:
 }
 
 
-7. Add New Attendee
+6. Add New Attendees to Attendees database
 
 URL : http://localhost:8080/api/v1/attendees
 Http Method: POST
@@ -63,7 +62,7 @@ Output:
     "response": "ok"
 }
 
-8. Add Attendees to talk
+7. enrool Attendees to the specific talk
 
 URL : http://localhost:8080/api/v1/talks/1/attendees/2
 Http Method: PUT
@@ -75,3 +74,31 @@ Output:
     "title": "TalkOnCreditSuisse",
     "response": "ok"
 }
+
+8. GET attendees by talk
+
+URL : http://localhost:8080/api/v1/attendees/TalkOnCreditSuisse
+Http Method: POST
+
+Output:
+[
+  {
+    "title": "TalkOnCreditSuisse",
+    "talkAbstract": "Discussion on Investment Banking",
+    "room": "R1001",
+    "speaker": {
+      "name": "Sailu Naredla",
+      "company": "Credit Suisse",
+      "email": "infonaredla@gmail.com",
+      "bio": "Technologist"
+    },
+    "attendees": [
+      {
+        "name": "Sailu Naredla",
+        "compnay": null,
+        "email": "infonaredla1@gmail.com",
+        "registered": "2021-11-20 15:33:17.187"
+      }
+    ]
+  }
+]

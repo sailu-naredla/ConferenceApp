@@ -3,11 +3,14 @@
  */
 package com.talks.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,11 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.talks.dto.AttendeeRequest;
 import com.talks.dto.AttendeeResponse;
+import com.talks.dto.TalkAttendees;
 import com.talks.dto.TalkInviteResponse;
 import com.talks.dto.TalksRequest;
 import com.talks.dto.TalksResponse;
 import com.talks.exception.DataNotFoundException;
 import com.talks.exception.DuplicateDataException;
+import com.talks.exception.InvalidInputException;
 import com.talks.exception.UnProcessableException;
 import com.talks.service.TalksService;
 
@@ -89,6 +94,25 @@ public class TalksController {
 		} catch(Exception ex){
 			response =  new ResponseEntity<>(new UnProcessableException("Unable to serve the request"), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		return response;
+		
+	}
+	
+	@GetMapping("/attendees/{talk_title}")
+	public ResponseEntity<Object> getTalkAttendees(@PathVariable("talk_title") String title){
+		
+		ResponseEntity<Object> response = null;
+		try {
+			List<TalkAttendees> attendeesResponse = talksService.getAllAttendessByTalk(title);
+			response =  new ResponseEntity<>(attendeesResponse, HttpStatus.OK);
+		} catch(InvalidInputException invalidInputException){
+			response =  new ResponseEntity<>(invalidInputException, HttpStatus.BAD_REQUEST);
+		} catch(DuplicateDataException duplicateDataException){
+			response =  new ResponseEntity<>(duplicateDataException, HttpStatus.ALREADY_REPORTED);
+		} catch(Exception ex){
+			response =  new ResponseEntity<>(new UnProcessableException("Unable to serve the request"), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 		return response;
 		
 	}

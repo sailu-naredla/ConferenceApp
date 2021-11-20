@@ -38,6 +38,12 @@ public class GlobalExceptionHandler {
 	        return getErrorInfoResponseEntity(httpServletReq, exception, HttpStatus.NOT_FOUND);
 	 }
 	 
+	 @ExceptionHandler(InvalidInputException.class)
+	    public ResponseEntity<ErrorInfo> handleInvalidInputException(HttpServletRequest httpServletReq,
+	            Exception exception) {
+	        return getErrorInfoResponseEntity(httpServletReq, exception, HttpStatus.BAD_REQUEST);
+	 }
+	 
 	 private ResponseEntity<ErrorInfo> getErrorInfoResponseEntity(HttpServletRequest httpServletReq, Exception exception,
 	            HttpStatus httpStatus) {
 	        ErrorInfo error = new ErrorInfo();
