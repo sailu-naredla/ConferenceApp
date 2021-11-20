@@ -15,7 +15,11 @@ INSERT INTO ROOMS (id, room_number, status, created_on) VALUES (3, 'R1003', true
 NOTE : no password required and click on connect
 
 
-5. Add new talk wih Room details
+5. Access Swagger UI to test API's
+
+http://localhost:8080/swagger-ui.html#/
+
+6. Add new talk wih Room details
 
 URL : http://localhost:8080/api/v1/talksto
 Http Method: POST
@@ -42,7 +46,7 @@ Output:
 }
 
 
-6. Add New Attendees to Attendees database
+7. Add New Attendees to Attendees database
 
 URL : http://localhost:8080/api/v1/attendees
 Http Method: POST
@@ -62,7 +66,7 @@ Output:
     "response": "ok"
 }
 
-7. enrool Attendees to the specific talk
+8. Enroll Attendees to the specific talk
 
 URL : http://localhost:8080/api/v1/talks/1/attendees/2
 Http Method: PUT
@@ -75,7 +79,7 @@ Output:
     "response": "ok"
 }
 
-8. GET attendees by talk
+9. GET attendees by talk
 
 URL : http://localhost:8080/api/v1/attendees/TalkOnCreditSuisse
 Http Method: POST
